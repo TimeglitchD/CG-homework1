@@ -14,19 +14,16 @@ var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Create geometry
+// Create geometry for earth
 var geometry = new THREE.SphereGeometry(1, 32, 24);
 normalMap = THREE.ImageUtils.loadTexture("earth_normal.jpg");
 colorMap = THREE.ImageUtils.loadTexture("earth.jpg");
 var material = new THREE.MeshPhongMaterial({ map: colorMap, normalMap: normalMap });
 var earth = new THREE.Mesh(geometry, material);
+
 scene.add(earth);
 
-eartcontrols = new THREE.OrbitControls(earth, renderer.domElement);
-eartcontrols.autoRotate = true;
-eartcontrols.autoRotateSpeed = 1;
-
-
+// Create skybox
 //var directions = ["posx.jpg", "negx.jpg", "posy.jpg", "negy.jpg", "posz.jpg", "negz.jpg"];
 var directions = ["posx.png", "negx.png", "posy.png", "negy.png", "posz.png", "negz.png"];
 var materialArray = [];
@@ -77,6 +74,9 @@ var render = function () {
     {
         camera.position.y = -100;
     }
+    var time = Date.now() * 0.0001;
+	earth.rotation.x = Math.sin(time*0.5) * 0.5;
+	earth.rotation.y = Math.PI * time;
     controls.update();
     renderer.render(scene, camera);
 }
