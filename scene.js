@@ -1,5 +1,7 @@
 // Create scene
-var scene = new THREE.Scene();
+const scene = new THREE.Scene();
+
+const loader = new THREE.CubeTextureLoader();
 
 // Create camera
 var camera = new THREE.PerspectiveCamera(
@@ -14,32 +16,41 @@ var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Create geometry for earth
-var geometry = new THREE.SphereGeometry(1, 32, 24);
-normalMap = THREE.ImageUtils.loadTexture("earth_normal.jpg");
-colorMap = THREE.ImageUtils.loadTexture("earth.jpg");
-var material = new THREE.MeshPhongMaterial({ map: colorMap, normalMap: normalMap });
-var earth = new THREE.Mesh(geometry, material);
-
-scene.add(earth);
 
 // Create skybox
-//var directions = ["posx.jpg", "negx.jpg", "posy.jpg", "negy.jpg", "posz.jpg", "negz.jpg"];
 var directions = ["posx.png", "negx.png", "posy.png", "negy.png", "posz.png", "negz.png"];
-var materialArray = [];
+var skyMaterial = [];
 for (var i = 0; i < 6; i++) {
-    materialArray.push(
+    skyMaterial.push(
         new THREE.MeshBasicMaterial({
-            map: THREE.ImageUtils.loadTexture(directions[i]),
+            map: new THREE.TextureLoader().load(directions[i]),
             side: THREE.BackSide
         })
     );
 }
 
+skyTexture = loader.load(["posx.png", "negx.png", "posy.png", "negy.png", "posz.png", "negz.png"]);
+
 var skyGeometry = new THREE.CubeGeometry(5000, 5000, 5000);
-var skyMaterial = new THREE.MeshFaceMaterial(materialArray);
 var skyBox = new THREE.Mesh(skyGeometry, skyMaterial);
 scene.add(skyBox);
+
+// Create geometry for earth
+var earthGeometry = new THREE.SphereGeometry(1, 32, 24);
+var earthNormalMap = new THREE.TextureLoader().load("earth_normal.jpg");
+var earthColorMap = new THREE.TextureLoader().load("earth.jpg");
+var earthMaterial = new THREE.MeshPhongMaterial({ map: earthColorMap, normalMap: earthNormalMap });
+var earth = new THREE.Mesh(earthGeometry, earthMaterial);
+scene.add(earth);
+
+// Create cylinder
+
+var cylinderGeometry = new THREE.CylinderGeometry( 1, 1, 20, 32 );
+var cylinderMaterial = new THREE.MeshPhongMaterial({envMap: skyTexture, color: 0xAAAAAA, combine: THREE.MixOperation});
+var cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
+scene.add(cylinder);
+cylinder.position.x = 5;
+
 
 // Define light
 var ambient = new THREE.AmbientLight(0x404040);
@@ -74,6 +85,7 @@ var render = function () {
     {
         camera.position.y = -100;
     }
+    //rotate earth around y axis and slightly around x axis
     var time = Date.now() * 0.0001;
 	earth.rotation.x = Math.sin(time*0.5) * 0.5;
 	earth.rotation.y = Math.PI * time;
