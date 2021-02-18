@@ -23,10 +23,14 @@
 
 THREE.OrbitControls = function ( object, domElement ) {
 
+
 	this.object = object;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
 
+
 	// API
+
+	
 
 	// Set to false to disable this control
 	this.enabled = true;
@@ -238,6 +242,20 @@ THREE.OrbitControls = function ( object, domElement ) {
 		scale *= dollyScale;
 
 	};
+
+	// extra code for zoom in and out with keys
+
+	this.zoomIn = function () {
+		this.dollyOut( getZoomScale() );
+		this.update();
+	};
+
+	this.zoomOut = function () {
+		this.dollyIn( getZoomScale() );
+		this.update();
+	};
+
+	//
 
 	this.update = function () {
 
